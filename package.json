@@ -1,0 +1,16 @@
+{
+  "name": "syntrix-airdrop-backend",
+  "version": "1.1.0",
+  "description": "Production-hardened Node.js backend engine for Syntrix Airdrop automation",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.43.4",
+    "cors": "^2.8.5",
+    "ethers": "^6.13.1",
+    "express": "^4.19.2",
+    "express-rate-limit": "^7.2.0"
+  }
+}
