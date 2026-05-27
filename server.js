@@ -7,32 +7,49 @@ const { createClient } = require("@supabase/supabase-js");
 
 const app = express();
 
-app.use(cors());
+app.use(cors({
+
+origin:"*",
+
+methods:[
+"GET",
+"POST"
+],
+
+allowedHeaders:[
+"Content-Type"
+]
+
+}));
+
 app.use(express.json());
 
-// Rate limit
 app.use(
-  rateLimit({
-    windowMs: 15 * 60 * 1000,
-    max: 100
-  })
+
+rateLimit({
+
+windowMs:
+15*60*1000,
+
+max:100
+
+})
+
 );
 
-// Supabase
-const supabase = createClient(
-  process.env.SUPABASE_URL,
-  process.env.SUPABASE_SERVICE_ROLE
-);
+const supabase =
+createClient(
 
-// Config
-const PRIVATE_KEY =
-process.env.PRIVATE_KEY;
+process.env.SUPABASE_URL,
+
+process.env.SUPABASE_SERVICE_ROLE
+
+);
 
 const TOKEN_ADDRESS =
 process.env.TOKEN_ADDRESS;
 
-// Health Check
-app.get("/", (req,res)=>{
+app.get("/",(req,res)=>{
 
 res.json({
 
@@ -46,10 +63,19 @@ reward:10
 
 });
 
-// Claim Endpoint
-app.post("/claim",async(req,res)=>{
+app.post("/claim",
+
+async(req,res)=>{
 
 try{
+
+console.log(
+
+"Request Body:",
+
+req.body
+
+);
 
 const {
 
@@ -58,7 +84,13 @@ email
 
 }=req.body;
 
-if(!wallet){
+if(
+
+!wallet ||
+
+wallet.trim()===""
+
+){
 
 return res
 .status(400)
@@ -71,18 +103,44 @@ error:
 
 }
 
-// 1 wallet = 1 claim
+const {
 
-const existing =
+data:existing,
+
+error:findError
+
+}=
+
 await supabase
+
 .from("claims")
+
 .select("*")
-.eq("wallet",wallet);
+
+.eq(
+
+"wallet",
+
+wallet
+
+);
+
+if(findError){
+
+console.log(
+
+findError
+
+);
+
+throw findError;
+
+}
 
 if(
 
-existing.data &&
-existing.data.length >= 1
+existing &&
+existing.length>=1
 
 ){
 
@@ -97,11 +155,16 @@ error:
 
 }
 
-// Save claim
+const {
 
-const { error } =
+error
+
+}=
+
 await supabase
+
 .from("claims")
+
 .insert([{
 
 wallet,
@@ -115,10 +178,27 @@ new Date()
 
 }]);
 
-if(error)
+if(error){
+
+console.log(
+
+"Insert Error",
+
+error
+
+);
+
 throw error;
 
-// Future token transfer here
+}
+
+console.log(
+
+"Inserted:",
+
+wallet
+
+);
 
 res.json({
 
@@ -135,30 +215,47 @@ message:
 
 catch(err){
 
-console.error(err);
+console.log(
+
+"Backend Error:",
+
+err
+
+);
 
 res
 .status(500)
 .json({
 
 error:
+
 err.message
 
 });
 
 }
 
-});
-
-const PORT =
-process.env.PORT || 3000;
-
-app.listen(PORT,()=>{
-
-console.log(
-
-`Syntrix backend running ${PORT}`
+}
 
 );
 
-});
+const PORT=
+
+process.env.PORT
+||3000;
+
+app.listen(
+
+PORT,
+
+()=>{
+
+console.log(
+
+`Running ${PORT}`
+
+);
+
+}
+
+);
