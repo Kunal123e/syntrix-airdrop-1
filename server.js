@@ -8,42 +8,24 @@ const { createClient } = require("@supabase/supabase-js");
 const app = express();
 
 app.use(cors({
-
-origin:"*",
-
-methods:[
-"GET",
-"POST"
-],
-
-allowedHeaders:[
-"Content-Type"
-]
-
+  origin:"*",
+  methods:["GET","POST"],
+  allowedHeaders:["Content-Type"]
 }));
 
 app.use(express.json());
 
 app.use(
-
-rateLimit({
-
-windowMs:
-15*60*1000,
-
-max:100
-
-})
-
+  rateLimit({
+    windowMs:15*60*1000,
+    max:100
+  })
 );
 
 const supabase =
 createClient(
-
-process.env.SUPABASE_URL,
-
-process.env.SUPABASE_SERVICE_ROLE
-
+  process.env.SUPABASE_URL,
+  process.env.SUPABASE_SERVICE_ROLE
 );
 
 const TOKEN_ADDRESS =
@@ -70,11 +52,8 @@ async(req,res)=>{
 try{
 
 console.log(
-
-"Request Body:",
-
+"Request:",
 req.body
-
 );
 
 const {
@@ -85,11 +64,8 @@ email
 }=req.body;
 
 if(
-
 !wallet ||
-
 wallet.trim()===""
-
 ){
 
 return res
@@ -113,24 +89,19 @@ error:findError
 
 await supabase
 
-.from("claims")
+.from("syntrix_claims")
 
 .select("*")
 
 .eq(
-
 "wallet",
-
 wallet
-
 );
 
 if(findError){
 
 console.log(
-
 findError
-
 );
 
 throw findError;
@@ -138,10 +109,8 @@ throw findError;
 }
 
 if(
-
 existing &&
 existing.length>=1
-
 ){
 
 return res
@@ -163,7 +132,7 @@ error
 
 await supabase
 
-.from("claims")
+.from("syntrix_claims")
 
 .insert([{
 
@@ -181,11 +150,7 @@ new Date()
 if(error){
 
 console.log(
-
-"Insert Error",
-
 error
-
 );
 
 throw error;
@@ -193,11 +158,8 @@ throw error;
 }
 
 console.log(
-
-"Inserted:",
-
+"Saved:",
 wallet
-
 );
 
 res.json({
@@ -216,11 +178,7 @@ message:
 catch(err){
 
 console.log(
-
-"Backend Error:",
-
 err
-
 );
 
 res
@@ -228,7 +186,6 @@ res
 .json({
 
 error:
-
 err.message
 
 });
@@ -240,7 +197,6 @@ err.message
 );
 
 const PORT=
-
 process.env.PORT
 ||3000;
 
