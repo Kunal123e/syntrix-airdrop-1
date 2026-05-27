@@ -16,16 +16,16 @@ app.use(cors({
 app.use(express.json());
 
 app.use(
-  rateLimit({
-    windowMs:15*60*1000,
-    max:100
-  })
+rateLimit({
+windowMs:15*60*1000,
+max:100
+})
 );
 
 const supabase =
 createClient(
-  process.env.SUPABASE_URL,
-  process.env.SUPABASE_SERVICE_ROLE
+process.env.SUPABASE_URL,
+process.env.SUPABASE_SERVICE_ROLE
 );
 
 const TOKEN_ADDRESS =
@@ -57,10 +57,8 @@ req.body
 );
 
 const {
-
 wallet,
 email
-
 }=req.body;
 
 if(
@@ -94,15 +92,13 @@ await supabase
 .select("*")
 
 .eq(
-"wallet",
+"wallet_address",
 wallet
 );
 
 if(findError){
 
-console.log(
-findError
-);
+console.log(findError);
 
 throw findError;
 
@@ -136,22 +132,28 @@ await supabase
 
 .insert([{
 
+wallet_address:
 wallet,
 
 email,
 
-amount:10,
+amount_rewarded:
+10,
 
 created_at:
-new Date()
+new Date(),
+
+tx_hash:
+null,
+
+status:
+"pending"
 
 }]);
 
 if(error){
 
-console.log(
-error
-);
+console.log(error);
 
 throw error;
 
@@ -177,9 +179,7 @@ message:
 
 catch(err){
 
-console.log(
-err
-);
+console.log(err);
 
 res
 .status(500)
